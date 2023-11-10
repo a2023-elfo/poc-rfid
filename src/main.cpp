@@ -2,6 +2,10 @@
 #include <LibRobus.h>
 #include <SoftwareSerial.h>
 
+const byte rxPin = 10;
+const byte txPin = 11;
+
+SoftwareSerial rfid = SoftwareSerial(rxPin, txPin);
 char* allowedTags[] = {"0E008E974354", "0415148DE36B"};
 char* tagName[] = {"carte", "rondelle"};
 int data = 0;
@@ -23,6 +27,7 @@ int findTag(char tagValue[])
 void setup() {
   BoardInit();
   Serial.begin(9600); 
+  rfid.begin(9600);
 }
 
 void loop() 
@@ -34,17 +39,17 @@ void loop()
   byte bytesread = 0;
   byte tempbyte = 0;
 
-  if (Serial.available() > 0)
+  if (rfid.available() > 0)
   {
     //On regarde pour le marquer de début STX(StartOfText) (2 est sa valeur ASCII)
-    if ((val = Serial.read()) == 2) 
+    if ((val = rfid.read()) == 2) 
     {
       // On lit les 10 caractères de la puce RFID + les 2 caractères de checksum
       while (bytesread < 12)
       {
-        if (Serial.available() > 0)
+        if (rfid.available() > 0)
         {
-          val = Serial.read();
+          val = rfid.read();
           // On check pour être sur qu'on lit le bon type de caractère
           if ((val == 0x0D) || (val == 0x0A) || (val == 0x03) || (val == 0x02))
           {
