@@ -1,27 +1,29 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 #include <SoftwareSerial.h>
+#include "rfid.h"
 
 const byte rxPin = 10;
 const byte txPin = 11;
 
 SoftwareSerial rfid = SoftwareSerial(rxPin, txPin);
 char* allowedTags[] = {"0E008E974354", "0415148DE36B"};
-char* tagName[] = {"carte", "rondelle"};
-int data = 0;
+Rfid r1(allowedTags[0], "marguerite", 30.5);
+Rfid r2(allowedTags[1], "pissenlit", 20.76);
+Rfid tags[] = {r1, r2};
+
 int numberofTags = sizeof(allowedTags)/sizeof(allowedTags[0]);
-char tagValue[13];
 
 int findTag(char tagValue[])
 {
   for (int i = 0; i < numberofTags; i++)
   {
-    if (strcmp(tagValue, allowedTags[i]) == 0)
+    if (strcmp(tagValue, tags[i].getTag()) == 0)
     {
       return i;
     }
   }
-  return -1;
+  return 0;
 }
 
 void setup() {
@@ -32,6 +34,46 @@ void setup() {
 
 void loop() 
 {
+  int valread = 0;
+  char val;
+  char rfidtag[12];
+  int i = 0;
+  int tagNumber = 0;
+
+  if (rfid.available() > 0)
+  {
+    if ((val = rfid.read()) == 2)
+    {
+      while (valread < 12)
+      {
+        if (rfid.available() > 0)
+        {
+          val = rfid.read();
+          if ((val == 0x0D) || (val == 0x0A) || (val == 0x03) || (val == 0x02))
+          {
+            break;
+          }
+          else
+          {
+            rfidtag[i] = val;
+          }
+        }
+      }
+      tagNumber = findTag(rfidtag);
+      if (tagNumber== 0)
+      {
+        //Tag  non trouvé dans la liste
+        Serial.println("ERREUR");
+      }
+      else
+      {
+        //Tag trouvé dans la liste
+        Serial.println(tags[tagNumber].getNomPlante());
+        Serial.println(tags[tagNumber].getTauxHumidite());
+      }
+    }
+  }
+  /*
   byte i = 0;
   byte val = 0;
   byte code[6] ;
@@ -87,7 +129,7 @@ void loop()
 
       if (bytesread == 12)
       {
-        /*
+        
         Serial.print("5-byte code: ");
         for (int i = 0; i < 5; i++)
         {
@@ -99,7 +141,7 @@ void loop()
           Serial.print(" ");
         }
         Serial.println();
-        */
+        
         Serial.print("Checksum : ");
         Serial.print(code[5], HEX);
         Serial.print(code[5] == checksum ? " -- passed." : " -- error.");
@@ -108,4 +150,5 @@ void loop()
       bytesread = 0;
     }
   }
+  */
 }
