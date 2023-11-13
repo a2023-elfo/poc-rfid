@@ -8,8 +8,8 @@ const byte txPin = 11;
 
 SoftwareSerial rfid = SoftwareSerial(rxPin, txPin);
 char* allowedTags[] = {"0E008E974354", "0415148DE36B"};
-Rfid r1(allowedTags[0], "marguerite", 30.5);
-Rfid r2(allowedTags[1], "pissenlit", 20.76);
+Rfid r1(allowedTags[0], "Marguerite", 30.5);
+Rfid r2(allowedTags[1], "Pissenlit", 20.76);
 Rfid tags[] = {r1, r2};
 
 int numberofTags = sizeof(allowedTags)/sizeof(allowedTags[0]);
@@ -23,7 +23,7 @@ int findTag(char tagValue[])
       return i;
     }
   }
-  return 0;
+  return -1;
 }
 
 void setup() {
@@ -36,7 +36,7 @@ void loop()
 {
   int valread = 0;
   char val;
-  char rfidtag[12];
+  char rfidtag[13];
   int i = 0;
   int tagNumber = 0;
 
@@ -56,11 +56,13 @@ void loop()
           else
           {
             rfidtag[i] = val;
+            i++;
           }
         }
       }
+      rfidtag[i] = '\0';
       tagNumber = findTag(rfidtag);
-      if (tagNumber== 0)
+      if (tagNumber == -1)
       {
         //Tag  non trouvé dans la liste
         Serial.println("ERREUR");
@@ -69,86 +71,7 @@ void loop()
       {
         //Tag trouvé dans la liste
         Serial.println(tags[tagNumber].getNomPlante());
-        Serial.println(tags[tagNumber].getTauxHumidite());
       }
     }
   }
-  /*
-  byte i = 0;
-  byte val = 0;
-  byte code[6] ;
-  byte checksum = 0;
-  byte bytesread = 0;
-  byte tempbyte = 0;
-
-  if (rfid.available() > 0)
-  {
-    //On regarde pour le marquer de début STX(StartOfText) (2 est sa valeur ASCII)
-    if ((val = rfid.read()) == 2) 
-    {
-      // On lit les 10 caractères de la puce RFID + les 2 caractères de checksum
-      while (bytesread < 12)
-      {
-        if (rfid.available() > 0)
-        {
-          val = rfid.read();
-          // On check pour être sur qu'on lit le bon type de caractère
-          if ((val == 0x0D) || (val == 0x0A) || (val == 0x03) || (val == 0x02))
-          {
-            // On arrête de lire pcq erreur
-            break;
-          }
-        }
-
-        // On convertit le code RFID hexadecimal
-        if ((val >= '0') && (val <= '9'))
-        {
-          val = val - '0';
-        }
-        else if ((val >= 'A') && (val <= 'F'))
-        {
-          val = 10 + val - 'A';
-        }
-
-        if (bytesread & 1 == 1)
-        {
-          code[bytesread >> 1] = (val | (tempbyte << 4));
-
-          if ((bytesread >> 1 != 5))
-          {
-            checksum ^= code[bytesread >> 1];
-          }
-        }
-        else
-        {
-          tempbyte = val;
-        }
-        // On lit le prochain caractère
-        bytesread++;
-      }
-
-      if (bytesread == 12)
-      {
-        
-        Serial.print("5-byte code: ");
-        for (int i = 0; i < 5; i++)
-        {
-          if (code[i] < 16)
-          {
-            Serial.print("0");
-          }
-          Serial.print(code[i], HEX);
-          Serial.print(" ");
-        }
-        Serial.println();
-        
-        Serial.print("Checksum : ");
-        Serial.print(code[5], HEX);
-        Serial.print(code[5] == checksum ? " -- passed." : " -- error.");
-        Serial.println();
-      }
-      bytesread = 0;
-    }
-  }
-  */
 }

@@ -1,9 +1,9 @@
 #include "rfid.h"
 
-Rfid::Rfid(char tags[], char nom[], float humidite)
+Rfid::Rfid(char numtag[], char plante[], float humidite)
 {
-    strcpy(this->tag, tags);
-    strcpy(this->nom_plante, nom);
+    strcpy(this->tag, numtag);
+    strcpy(this->nom_plante, plante);
     this->taux_humidite = humidite;
 }
 

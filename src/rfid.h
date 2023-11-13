@@ -1,17 +1,17 @@
 #include <Arduino.h>
+#include <string.h>
 
 class Rfid
 {
 public :
-    Rfid();
     Rfid(char numtag[], char plante[], float humidite);
     ~Rfid();
-    char getNomPlante(char tag[]);
-    float getTauxHumidite(char tag[]);
-    int findTag(char tag[]);
+    char* getTag();
+    char* getNomPlante();
+    float getTauxHumidite();
 
 private :
-    char tag[12];
-    char nom_plante[12];
+    char tag[13];
+    char nom_plante[30];
     float taux_humidite;
 };
