@@ -9,7 +9,6 @@ char* allowedTags[] = {"0E008E974354", "0415148DE36B"};
 Rfid r1(allowedTags[0], "Marguerite", 30.5);
 Rfid r2(allowedTags[1], "Pissenlit", 20.76);
 Rfid tags[] = {r1, r2};
-int lecture = 0;
 
 int numberofTags = sizeof(allowedTags)/sizeof(allowedTags[0]);
 
@@ -34,37 +33,6 @@ void setup() {
 
 void loop() 
 {
-  
-  if (lecture == 0)
-  {
-    MOTOR_SetSpeed(LEFT, 0.4);
-    MOTOR_SetSpeed(RIGHT, 0.4);
-  }
-  else
-  {
-    MOTOR_SetSpeed(LEFT, 0);
-    MOTOR_SetSpeed(RIGHT, 0);
-    delay(2000);
-
-    while (ROBUS_ReadIR(0) < 150)
-    {
-      MOTOR_SetSpeed(RIGHT, 0.1);
-      MOTOR_SetSpeed(LEFT, -0.1);
-    }
-    MOTOR_SetSpeed(LEFT, 0);
-    MOTOR_SetSpeed(RIGHT, 0);
-    delay(1000);
-
-    while (ROBUS_ReadIR(0) < 500)
-    {
-      MOTOR_SetSpeed(RIGHT, 0.2);
-      MOTOR_SetSpeed(LEFT, 0.2);
-    }
-    MOTOR_SetSpeed(LEFT, 0);
-    MOTOR_SetSpeed(RIGHT, 0);
-    delay(5000);
-  }
-
   int valread = 0;
   char val;
   char rfidtag[13];
@@ -95,14 +63,16 @@ void loop()
       tagNumber = findTag(rfidtag);
       if (tagNumber == -1)
       {
-        // Tag  non trouvé dans la liste
+        // Tag non trouvé dans la liste
         Serial.println("ERREUR");
       }
       else
       {
         // Tag trouvé dans la liste
+        Serial.print("Nom de la plante associée au tag : ");
         Serial.println(tags[tagNumber].getNomPlante());
-        lecture = 1;
+        Serial.print("Taux d'humidité requis : ");
+        Serial.println(tags[tagNumber].getTauxHumidite());
       }
     }
   }
