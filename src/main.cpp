@@ -5,9 +5,10 @@
 
 const byte ledPin = 22;
 
-char* allowedTags[] = {"0E008E974354", "0415148DE36B"};
-Rfid r1(allowedTags[0], "Marguerite", 30.5);
-Rfid r2(allowedTags[1], "Pissenlit", 20.76);
+char* allowedTags[] = {"0E008E974354", "1600C3C98A96", "1600BF97BA84"};
+Rfid r1(allowedTags[0], "Gazania", 50.0);
+Rfid r2(allowedTags[1], "Cactus", 0.0);
+Rfid r3(allowedTags[2], "Marguerite", 30.0);
 Rfid tags[] = {r1, r2};
 
 int numberofTags = sizeof(allowedTags)/sizeof(allowedTags[0]);
@@ -64,11 +65,15 @@ void loop()
       if (tagNumber == -1)
       {
         // Tag non trouvé dans la liste
-        Serial.println("ERREUR");
+        for (int i = 0; i < 12; i++)
+        {
+          Serial.print(rfidtag[i]);
+        }
       }
       else
       {
         // Tag trouvé dans la liste
+        Serial.println(tags[tagNumber].getTag());
         Serial.print("Nom de la plante associée au tag : ");
         Serial.println(tags[tagNumber].getNomPlante());
         Serial.print("Taux d'humidité requis : ");
